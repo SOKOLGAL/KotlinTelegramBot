@@ -15,11 +15,11 @@ fun main() {
 
     while (true) {
         println(greetings)
-        val enterMenuItemNumber = readlnOrNull()
+        val enterMenuItemNumber = readlnOrNull()?.toIntOrNull()
         when (enterMenuItemNumber) {
-            1.toString() -> println("Выбран пункт \"Учить слова\"")
-            2.toString() -> println("Выбран пункт \"Статистика\"")
-            0.toString() -> break
+            1 -> println("Выбран пункт \"Учить слова\"")
+            2 -> println("Выбран пункт \"Статистика\"")
+            0 -> break
             else -> println("Введите число 1, 2 или 0")
         }
     }
@@ -33,9 +33,7 @@ fun loadDictionary(): MutableList<Word> {
 
     for (line in lines) {
         val line = line.split("|")
-        var word = Word(original = line[0], translate = line[1], correctAnswersCount = line[2].toIntOrNull())
-        var correctAnswersCount: Int = word.correctAnswersCount ?: 0
-        word = word.copy(correctAnswersCount = correctAnswersCount)
+        var word = Word(original = line[0], translate = line[1], correctAnswersCount = line[2].toIntOrNull() ?: 0)
         dictionary.add(word)
     }
     return dictionary
