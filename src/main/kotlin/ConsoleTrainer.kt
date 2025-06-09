@@ -1,7 +1,12 @@
-package org.example.stage_3
+package org.example
 
-import org.example.stage_2.Word
 import java.io.File
+
+data class Word(
+    val original: String,
+    val translate: String,
+    var correctAnswersCount: Int? = 0,
+)
 
 fun main() {
 
@@ -11,14 +16,14 @@ fun main() {
         2 - Статистика
         0 - Выход
     """.trimIndent()
-    val dictionary = loadDictionary()
+    val dictionary: List<Word> = loadDictionary()
 
     while (true) {
         println(greetings)
         val enterMenuItemNumber = readlnOrNull()?.toIntOrNull()
         when (enterMenuItemNumber) {
             1 -> println("Выбран пункт \"Учить слова\"")
-            2 -> println("Выбран пункт \"Статистика\"")
+            2 -> getLearnedWords(dictionary)
             0 -> break
             else -> println("Введите число 1, 2 или 0")
         }
@@ -26,7 +31,20 @@ fun main() {
 
 }
 
-fun loadDictionary(): MutableList<Word> {
+fun getLearnedWords(dictionary: List<Word>) {
+    val totalCount = dictionary.size
+    var learnedCount = 0
+    dictionary.forEach {
+        if ((it.correctAnswersCount ?: 0) >= NUMBER_CORRECT_ANSWERS) {
+            learnedCount++
+        }
+    }
+    val percent = learnedCount * PERCENT / totalCount
+    println("Выучено $learnedCount из $totalCount | $percent")
+    println()
+}
+
+fun loadDictionary(): List<Word> {
     val wordsFile: File = File("words.txt")
     val lines = wordsFile.readLines()
     val dictionary: MutableList<Word> = mutableListOf()
@@ -38,3 +56,6 @@ fun loadDictionary(): MutableList<Word> {
     }
     return dictionary
 }
+
+const val NUMBER_CORRECT_ANSWERS = 3
+const val PERCENT = 100
