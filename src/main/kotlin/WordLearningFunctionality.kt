@@ -44,7 +44,7 @@ fun learnWords(dictionary: List<Word>) {
         for ((index, value) in answerOptions.withIndex()) {
             println("${index + 1} - $value")
         }
-        val answer = readln().toIntOrNull()
+        val answer = readlnOrNull()?.toIntOrNull()
     }
 }
 
