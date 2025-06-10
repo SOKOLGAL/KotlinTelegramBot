@@ -22,13 +22,31 @@ fun main() {
         println(greetings)
         val enterMenuItemNumber = readlnOrNull()?.toIntOrNull()
         when (enterMenuItemNumber) {
-            1 -> println("Выбран пункт \"Учить слова\"")
+            1 -> learnWords(dictionary)
             2 -> getLearnedWords(dictionary)
             0 -> break
             else -> println("Введите число 1, 2 или 0")
         }
     }
 
+}
+
+fun learnWords(dictionary: List<Word>) {
+    val notLearnedList = dictionary.filter { (it.correctAnswersCount ?: 0) < NUMBER_CORRECT_ANSWERS }
+    if (notLearnedList.size == 0) {
+        println("Все слова в словаре выучены")
+    } else {
+        val questionWords = notLearnedList.shuffled().take(4).shuffled()
+        println()
+        val correctAnswer = questionWords.map { it.original }[0]
+        println("$correctAnswer:")
+        val answerOptions = questionWords.map { it.translate }.shuffled()
+        for ((index, value) in answerOptions.withIndex()) {
+            println("${index + 1} - $value")
+        }
+
+        val userAnswerInput = readlnOrNull()?.toIntOrNull()
+    }
 }
 
 fun getLearnedWords(dictionary: List<Word>) {
