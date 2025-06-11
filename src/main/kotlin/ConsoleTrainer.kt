@@ -33,20 +33,40 @@ fun main() {
 
 fun learnWords(dictionary: List<Word>) {
     val notLearnedList = dictionary.filter { (it.correctAnswersCount ?: 0) < NUMBER_CORRECT_ANSWERS }
-    if (notLearnedList.size == 0) {
-        println("Все слова в словаре выучены")
-    } else {
-        val questionWords = notLearnedList.shuffled().take(4).shuffled()
-        println()
-        val correctAnswer = questionWords.map { it.original }[0]
-        println("$correctAnswer:")
-        val answerOptions = questionWords.map { it.translate }.shuffled()
-        for ((index, value) in answerOptions.withIndex()) {
-            println("${index + 1} - $value")
+    if (notLearnedList.isEmpty()) return println("Все слова в словаре выучены")
+    val questionWords = notLearnedList.shuffled().take(NUMBER_OF_UNLEARNED_WORDS_TO_SHOW).shuffled()
+    val correctAnswer = questionWords.map { it.original }[0]
+    println("\n$correctAnswer:")
+    var correctAnswerId: Int = 0
+    questionWords.shuffled().forEachIndexed { index, word ->
+        println("${index + 1} - ${word.translate}")
+        for (i in questionWords) {
+            if (word.original == correctAnswer)
+                correctAnswerId = index + 1
         }
-
-        val userAnswerInput = readlnOrNull()?.toIntOrNull()
     }
+    println("----------\n0 - Меню")
+    val userAnswerInput = readlnOrNull()?.toIntOrNull()
+    if (userAnswerInput == 0) return
+    if (userAnswerInput == correctAnswerId) {
+        println("Правильно!")
+        for (i in dictionary) {
+            if (i.original == correctAnswer) {
+                i.correctAnswersCount = (i.correctAnswersCount ?: 0) + 1
+            }
+        }
+        saveDictionary(dictionary)
+    } else {
+        for (i in questionWords) {
+            if (i.original == correctAnswer)
+                println("Неправильно! $correctAnswer - это ${i.translate}")
+        }
+    }
+}
+
+fun saveDictionary(dictionary: List<Word>) {
+    val wordsFile: File = File("words.txt")
+    wordsFile.writeText(dictionary.toString())
 }
 
 fun getLearnedWords(dictionary: List<Word>) {
@@ -58,8 +78,7 @@ fun getLearnedWords(dictionary: List<Word>) {
         }
     }
     val percent = learnedCount * PERCENT / totalCount
-    println("Выучено $learnedCount из $totalCount | $percent")
-    println()
+    println("Выучено $learnedCount из $totalCount | $percent\n")
 }
 
 fun loadDictionary(): List<Word> {
@@ -69,7 +88,7 @@ fun loadDictionary(): List<Word> {
 
     for (line in lines) {
         val line = line.split("|")
-        var word = Word(original = line[0], translate = line[1], correctAnswersCount = line[2].toIntOrNull() ?: 0)
+        val word = Word(original = line[0], translate = line[1], correctAnswersCount = line[2].toIntOrNull() ?: 0)
         dictionary.add(word)
     }
     return dictionary
@@ -77,3 +96,4 @@ fun loadDictionary(): List<Word> {
 
 const val NUMBER_CORRECT_ANSWERS = 3
 const val PERCENT = 100
+const val NUMBER_OF_UNLEARNED_WORDS_TO_SHOW = 4
