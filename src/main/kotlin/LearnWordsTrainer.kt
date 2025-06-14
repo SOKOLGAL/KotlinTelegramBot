@@ -13,24 +13,30 @@ data class Question(
     val correctAnswer: Word,
 )
 
-class LearnWordsTrainer {
+class LearnWordsTrainer(private val learnedAnswerCount: Int = 3, val countOfQuestionWords: Int = 4) {
     private val dictionary: List<Word> = loadDictionary()
     private var question: Question? = null
 
     fun getStatistics(): Statistics {
-        val learnedCount = dictionary.filter { (it.correctAnswersCount ?: 0) >= NUMBER_CORRECT_ANSWERS }.size
+        val learnedCount = dictionary.filter { (it.correctAnswersCount ?: 0) >= learnedAnswerCount }.size
         val totalCount = dictionary.size
         val percent = learnedCount * PERCENT / totalCount
         return Statistics(totalCount, learnedCount, percent)
     }
 
     fun getNextQuestion(): Question? {
-        val notLearnedList = dictionary.filter { (it.correctAnswersCount ?: 0) < NUMBER_CORRECT_ANSWERS }
+        val notLearnedList = dictionary.filter { (it.correctAnswersCount ?: 0) < learnedAnswerCount }
         if (notLearnedList.isEmpty()) return null
-        val questionWord = notLearnedList.shuffled().take(NUMBER_OF_UNLEARNED_WORDS_TO_SHOW).shuffled()
-        val correctAnswer = questionWord.random()
+        val questionWords = if (notLearnedList.size < countOfQuestionWords) {
+            val learnedList = dictionary.filter { (it.correctAnswersCount ?: 0) >= learnedAnswerCount }.shuffled()
+            notLearnedList.shuffled().take(countOfQuestionWords) +
+                    learnedList.take(countOfQuestionWords - notLearnedList.size)
+        } else {
+            notLearnedList.shuffled().take(countOfQuestionWords)
+        }.shuffled()
+        val correctAnswer = questionWords.random()
         question = Question(
-            variants = questionWord,
+            variants = questionWords,
             correctAnswer = correctAnswer,
         )
         return question
@@ -50,13 +56,17 @@ class LearnWordsTrainer {
     }
 
     private fun loadDictionary(): List<Word> {
-        val dictionary: MutableList<Word> = mutableListOf()
-        val wordsFile: File = File("words.txt")
-        wordsFile.readLines().forEach {
-            val splitLine = it.split("|")
-            dictionary.add(Word(splitLine[0], splitLine[1], splitLine[2].toIntOrNull() ?: 0))
+        try {
+            val dictionary: MutableList<Word> = mutableListOf()
+            val wordsFile: File = File("words.txt")
+            wordsFile.readLines().forEach {
+                val splitLine = it.split("|")
+                dictionary.add(Word(splitLine[0], splitLine[1], splitLine[2].toIntOrNull() ?: 0))
+            }
+            return dictionary
+        } catch (e: IndexOutOfBoundsException) {
+            throw IllegalStateException("некорректный файл")
         }
-        return dictionary
     }
 
     private fun saveDictionary(dictionary: List<Word>) {
