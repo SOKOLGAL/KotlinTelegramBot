@@ -28,7 +28,7 @@ class LearnWordsTrainer(private val learnedAnswerCount: Int = 3, private val cou
         val notLearnedList = dictionary.filter { (it.correctAnswersCount ?: 0) < learnedAnswerCount }
         if (notLearnedList.isEmpty()) return null
         val questionWords = if (notLearnedList.size < countOfQuestionWords) {
-            val learnedList = dictionary.filter { (it.correctAnswersCount ?: 0) >= learnedAnswerCount }.shuffled()
+            val learnedList = dictionary.filter { it.correctAnswersCount!! >= learnedAnswerCount }.shuffled()
             notLearnedList.shuffled().take(countOfQuestionWords) +
                     learnedList.take(countOfQuestionWords - notLearnedList.size)
         } else {
