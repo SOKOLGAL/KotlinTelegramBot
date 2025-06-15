@@ -3,7 +3,7 @@ package org.example
 data class Word(
     val original: String,
     val translate: String,
-    var correctAnswersCount: Int? = 0,
+    var correctAnswersCount: Int = 0,
 )
 
 fun Question.asConsoleString(): String {
@@ -15,7 +15,13 @@ fun Question.asConsoleString(): String {
 
 fun main() {
 
-    val trainer = LearnWordsTrainer()
+    val trainer = try {
+        LearnWordsTrainer(learnedAnswerCount = 3, countOfQuestionWords = 4)
+    } catch (e: Exception) {
+        println("Невозможно загрузить словарь")
+        return
+    }
+
     val greetings = """
         Меню:
         1 - Учить слова
@@ -62,6 +68,4 @@ fun main() {
 
 }
 
-const val NUMBER_CORRECT_ANSWERS = 3
 const val PERCENT = 100
-const val NUMBER_OF_UNLEARNED_WORDS_TO_SHOW = 4
