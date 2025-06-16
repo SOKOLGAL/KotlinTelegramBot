@@ -31,6 +31,7 @@ fun main(args: Array<String>) {
         println(chatId)
 
         telegramBotService.sendMessage(chatId, text)
+
     }
 
 }
