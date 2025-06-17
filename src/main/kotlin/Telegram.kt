@@ -29,10 +29,13 @@ fun main(args: Array<String>) {
         val chatId = group2?.get(1)?.value?.toIntOrNull()
 
         if (chatId != null && text != null) {
-            if (text.length in 1..4096) {
+            if (text.length in MINIMUM_NUMBER_OF_CHARACTERS_IN_TEXT..MAXIMUM_NUMBER_OF_CHARACTERS_IN_TEXT) {
                 telegramBotService.sendMessage(chatId, text)
             }
         }
     }
 
 }
+
+const val MINIMUM_NUMBER_OF_CHARACTERS_IN_TEXT = 1
+const val MAXIMUM_NUMBER_OF_CHARACTERS_IN_TEXT = 4096
