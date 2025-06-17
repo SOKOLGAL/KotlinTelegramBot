@@ -4,31 +4,28 @@ fun main(args: Array<String>) {
 
     val botToken = args[0]
     val telegramBotService = TelegramBotService(botToken)
-    var updateIdRegex: Regex
-    var messageTextRegex: Regex
-    var chatIdRegex: Regex
+    val updateIdRegex: Regex = "\"update_id\":(.+?),\n\"message\":".toRegex()
+    val messageTextRegex: Regex = "\"text\":\"(.+?)\"".toRegex()
+    val chatIdRegex: Regex = """},"chat":\{"id":(\d+),"first_name"""".toRegex()
     var updateId: Int = 0
 
     while (true) {
         Thread.sleep(2000)
         val updates: String = telegramBotService.getUpdates(updateId)
         println(updates)
-        updateIdRegex = "\"update_id\":(.+?),\n\"message\":".toRegex()
-        val matchResult1: MatchResult? = updateIdRegex.find(updates)
-        val group1: MatchGroupCollection? = matchResult1?.groups
-        updateId = group1?.get(1)?.value?.toInt()?.plus(1) ?: continue
+        val updateIdMatchResult: MatchResult? = updateIdRegex.find(updates)
+        val updateIdMatchGroup: MatchGroupCollection? = updateIdMatchResult?.groups
+        updateId = updateIdMatchGroup?.get(1)?.value?.toInt()?.plus(1) ?: continue
 
-        messageTextRegex = "\"text\":\"(.+?)\"".toRegex()
-        val matchResult: MatchResult? = messageTextRegex.find(updates)
-        val group: MatchGroupCollection? = matchResult?.groups
-        val text = group?.get(1)?.value
+        val textMatchResult: MatchResult? = messageTextRegex.find(updates)
+        val textMatchGroup: MatchGroupCollection? = textMatchResult?.groups
+        val text = textMatchGroup?.get(1)?.value
 
-        chatIdRegex = """},"chat":\{"id":(\d+),"first_name"""".toRegex()
-        val matchResult2: MatchResult? = chatIdRegex.find(updates)
-        val group2: MatchGroupCollection? = matchResult2?.groups
-        val chatId = group2?.get(1)?.value?.toIntOrNull()
+        val chatIdMatchResult: MatchResult? = chatIdRegex.find(updates)
+        val chatIdMatchGroup: MatchGroupCollection? = chatIdMatchResult?.groups
+        val chatId = chatIdMatchGroup?.get(1)?.value?.toIntOrNull() ?: continue
 
-        if (chatId != null && text != null) {
+        if (text != null) {
             if (text.length in MINIMUM_NUMBER_OF_CHARACTERS_IN_TEXT..MAXIMUM_NUMBER_OF_CHARACTERS_IN_TEXT) {
                 telegramBotService.sendMessage(chatId, text)
             }
