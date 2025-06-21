@@ -75,4 +75,45 @@ class TelegramBotService(private val botToken: String) {
         val response: HttpResponse<String> = client.send(request, HttpResponse.BodyHandlers.ofString())
         return response.body()
     }
+
+    fun sendQuestion(chatId: Int, question: Question): String {
+        val optionsList = question.variants.mapIndexed { index, word ->
+            word.translate
+        }
+        val urlSendMessage = "$BASE_URL/bot$botToken/sendMessage"
+        val sendQuestionBody = """
+{
+"chat_id": $chatId,
+"text": "${question.correctAnswer.original}",
+"reply_markup": {
+  "inline_keyboard": [
+    [
+      {
+        "text": "${optionsList[0]}",
+        "callback_data": "$CALLBACK_DATA_ANSWER_PREFIX${optionsList.indexOf(optionsList[0])}"
+      },
+      {
+        "text": "${optionsList[1]}",
+        "callback_data": "$CALLBACK_DATA_ANSWER_PREFIX${optionsList.indexOf(optionsList[1])}"
+      },
+      {
+        "text": "${optionsList[2]}",
+        "callback_data": "$CALLBACK_DATA_ANSWER_PREFIX${optionsList.indexOf(optionsList[2])}"
+      },
+      {
+        "text": "${optionsList[3]}",
+        "callback_data": "$CALLBACK_DATA_ANSWER_PREFIX${optionsList.indexOf(optionsList[3])}"
+      }
+    ]
+  ]
+}
+}
+""".trimIndent()
+        val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlSendMessage))
+            .header("Content-type", "application/json")
+            .POST(HttpRequest.BodyPublishers.ofString(sendQuestionBody))
+            .build()
+        val response: HttpResponse<String> = client.send(request, HttpResponse.BodyHandlers.ofString())
+        return response.body()
+    }
 }
