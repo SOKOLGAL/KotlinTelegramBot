@@ -40,7 +40,6 @@ fun main(args: Array<String>) {
             val isCorrect = trainer.checkAnswer(userAnswerIndex)
             if (isCorrect) {
                 telegramBotService.sendMessage(chatId, "Правильно!")
-//                trainer.question?.correctAnswer?.correctAnswersCount?.plus(1)
             } else {
                 val message = """
                Неправильно!
