@@ -31,7 +31,7 @@ fun main(args: Array<String>) {
         }
 
         if (data?.lowercase() == STATISTICS_BUTTON_PRESSED) {
-            telegramBotService.sendStatistics(trainer, chatId)
+            telegramBotService.sendStatistics(trainer.getStatistics(), chatId)
         }
     }
 

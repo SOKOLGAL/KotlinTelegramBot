@@ -63,9 +63,9 @@ class TelegramBotService(private val botToken: String) {
         return response.body()
     }
 
-    fun sendStatistics(trainer: LearnWordsTrainer, chatId: Int): String {
-        val text = "Выучено ${trainer.getStatistics().learnedCount} из ${trainer.getStatistics().totalCount} слов | " +
-                "${trainer.getStatistics().percent}%\n"
+    fun sendStatistics(statistics: Statistics, chatId: Int): String {
+        val text = "Выучено ${statistics.learnedCount} из ${statistics.totalCount} слов | " +
+                "${statistics.percent}%\n"
         val encoded = URLEncoder.encode(
             text,
             StandardCharsets.UTF_8
