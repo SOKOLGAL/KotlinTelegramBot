@@ -75,7 +75,7 @@ class LearnWordsTrainer(private val learnedAnswerCount: Int = 3, private val cou
         }
     }
 
-    private fun saveDictionary(dictionary: List<Word>) {
+   private fun saveDictionary(dictionary: List<Word>) {
         val wordsFile: File = File("words.txt")
         wordsFile.writeText("")
         for (word in dictionary) {
