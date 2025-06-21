@@ -29,9 +29,13 @@ fun main(args: Array<String>) {
         if (text?.lowercase() == "/start") {
             telegramBotService.sendMenu(chatId)
         }
-        if (data?.lowercase() == "statistics_clicked") {
-            telegramBotService.sendMessage(chatId, "Выучено 10 из 10 слов | 100%")
+
+        if (data?.lowercase() == STATISTICS_BUTTON_PRESSED) {
+            telegramBotService.sendStatistics(trainer.getStatistics(), chatId)
         }
     }
 
 }
+
+const val STATISTICS_BUTTON_PRESSED = "statistics_clicked"
+const val LEARN_WORD_BUTTON_PRESSED = "learn_words_clicked"

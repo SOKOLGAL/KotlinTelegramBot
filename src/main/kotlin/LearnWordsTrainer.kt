@@ -83,3 +83,5 @@ class LearnWordsTrainer(private val learnedAnswerCount: Int = 3, private val cou
         }
     }
 }
+
+const val PERCENT = 100

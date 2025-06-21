@@ -17,11 +17,11 @@ fun main() {
     }
 
     val greetings = """
-        Меню:
-        1 - Учить слова
-        2 - Статистика
-        0 - Выход
-    """.trimIndent()
+       Меню:
+       1 - Учить слова
+       2 - Статистика
+       0 - Выход
+   """.trimIndent()
 
     while (true) {
         println(greetings)
@@ -59,7 +59,4 @@ fun main() {
             else -> println("Введите число 1, 2 или 0")
         }
     }
-
 }
-
-const val PERCENT = 100
