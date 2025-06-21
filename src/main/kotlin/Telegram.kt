@@ -34,6 +34,7 @@ fun main(args: Array<String>) {
             telegramBotService.sendStatistics(trainer, chatId)
         }
     }
+
 }
 
 const val STATISTICS_BUTTON_PRESSED = "statistics_clicked"
