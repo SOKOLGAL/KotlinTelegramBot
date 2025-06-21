@@ -29,6 +29,7 @@ fun main(args: Array<String>) {
         if (text?.lowercase() == "/start") {
             telegramBotService.sendMenu(chatId)
         }
+
         if (data?.lowercase() == STATISTICS_BUTTON_PRESSED) {
             telegramBotService.sendStatistics(trainer, chatId)
         }
