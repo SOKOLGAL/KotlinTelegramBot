@@ -48,7 +48,7 @@ fun checkNextQuestionAndSend(
     if (nextQuestion == null) {
         telegramBotService.sendMessage(chatId, "Все слова в словаре выучены")
     } else {
-        telegramBotService.sendQuestion(chatId, trainer.question)
+        telegramBotService.sendQuestion(chatId, nextQuestion)
     }
 }
 

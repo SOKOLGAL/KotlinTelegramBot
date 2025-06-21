@@ -53,7 +53,7 @@ class LearnWordsTrainer(private val learnedAnswerCount: Int = 3, private val cou
             val correctAnswerId = it.variants.indexOf(it.correctAnswer)
             if (correctAnswerId == userAnswerInput) {
                 it.correctAnswer.correctAnswersCount + 1
-                saveDictionary(dictionary)
+                saveDictionary()
                 true
             } else {
                 false
@@ -75,7 +75,7 @@ class LearnWordsTrainer(private val learnedAnswerCount: Int = 3, private val cou
         }
     }
 
-    private fun saveDictionary(dictionary: List<Word>) {
+    private fun saveDictionary() {
         val wordsFile: File = File("words.txt")
         wordsFile.writeText("")
         for (word in dictionary) {

@@ -76,15 +76,15 @@ class TelegramBotService(private val botToken: String) {
         return response.body()
     }
 
-    fun sendQuestion(chatId: Int, question: Question?): String {
-        val optionsList = question?.variants?.mapIndexed { index, word ->
+    fun sendQuestion(chatId: Int, question: Question): String {
+        val optionsList = question.variants.mapIndexed { index, word ->
             word.translate
-        } ?: emptyList()
+        }
         val urlSendMessage = "$BASE_URL/bot$botToken/sendMessage"
         val sendQuestionBody = """
 {
 "chat_id": $chatId,
-"text": "${question?.correctAnswer?.original}",
+"text": "${question.correctAnswer.original}",
 "reply_markup": {
   "inline_keyboard": [
     [
