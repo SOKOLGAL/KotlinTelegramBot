@@ -21,7 +21,7 @@ data class Question(
 
 class LearnWordsTrainer(private val learnedAnswerCount: Int = 3, private val countOfQuestionWords: Int = 4) {
     private val dictionary: List<Word> = loadDictionary()
-    private var question: Question? = null
+    var question: Question? = null
 
     fun getStatistics(): Statistics {
         val learnedCount = dictionary.filter { it.correctAnswersCount >= learnedAnswerCount }.size
@@ -75,7 +75,7 @@ class LearnWordsTrainer(private val learnedAnswerCount: Int = 3, private val cou
         }
     }
 
-   private fun saveDictionary(dictionary: List<Word>) {
+    private fun saveDictionary(dictionary: List<Word>) {
         val wordsFile: File = File("words.txt")
         wordsFile.writeText("")
         for (word in dictionary) {

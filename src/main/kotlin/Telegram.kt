@@ -33,9 +33,25 @@ fun main(args: Array<String>) {
         if (data?.lowercase() == STATISTICS_BUTTON_PRESSED) {
             telegramBotService.sendStatistics(trainer.getStatistics(), chatId)
         }
+        if (data?.lowercase() == LEARN_WORD_BUTTON_PRESSED) {
+            checkNextQuestionAndSend(trainer, telegramBotService, chatId)
+        }
     }
+}
 
+fun checkNextQuestionAndSend(
+    trainer: LearnWordsTrainer,
+    telegramBotService: TelegramBotService,
+    chatId: Int
+) {
+    val nextQuestion = trainer.getNextQuestion()
+    if (nextQuestion == null) {
+        telegramBotService.sendMessage(chatId, "Все слова в словаре выучены")
+    } else {
+        telegramBotService.sendQuestion(chatId, trainer.question)
+    }
 }
 
 const val STATISTICS_BUTTON_PRESSED = "statistics_clicked"
 const val LEARN_WORD_BUTTON_PRESSED = "learn_words_clicked"
+const val CALLBACK_DATA_ANSWER_PREFIX = "answer_"
