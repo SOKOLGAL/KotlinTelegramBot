@@ -2,6 +2,12 @@ package org.example
 
 import java.io.File
 
+data class Word(
+    val original: String,
+    val translate: String,
+    var correctAnswersCount: Int = 0,
+)
+
 data class Statistics(
     val totalCount: Int,
     var learnedCount: Int,
@@ -69,7 +75,7 @@ class LearnWordsTrainer(private val learnedAnswerCount: Int = 3, private val cou
         }
     }
 
-    private fun saveDictionary(dictionary: List<Word>) {
+   private fun saveDictionary(dictionary: List<Word>) {
         val wordsFile: File = File("words.txt")
         wordsFile.writeText("")
         for (word in dictionary) {
