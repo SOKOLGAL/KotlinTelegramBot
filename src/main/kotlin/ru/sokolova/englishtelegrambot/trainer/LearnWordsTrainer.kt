@@ -41,7 +41,7 @@ class LearnWordsTrainer(
         return question?.let {
             val correctAnswerId = it.variants.indexOf(it.correctAnswer)
             if (correctAnswerId == userAnswerInput) {
-                it.correctAnswer.correctAnswersCount = it.correctAnswer.correctAnswersCount + 1
+                it.correctAnswer.correctAnswersCount += 1
                 saveDictionary()
                 true
             } else {
