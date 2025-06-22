@@ -3,6 +3,7 @@ package ru.sokolova.englishtelegrambot.telegram.api
 import kotlinx.serialization.json.Json
 import ru.sokolova.englishtelegrambot.telegram.CALLBACK_DATA_ANSWER_PREFIX
 import ru.sokolova.englishtelegrambot.telegram.LEARN_WORD_BUTTON_PRESSED
+import ru.sokolova.englishtelegrambot.telegram.RESET_PRESSED
 import ru.sokolova.englishtelegrambot.telegram.STATISTICS_BUTTON_PRESSED
 import ru.sokolova.englishtelegrambot.telegram.api.entities.InlineKeyboard
 import ru.sokolova.englishtelegrambot.telegram.api.entities.ReplyMarkup
@@ -20,7 +21,6 @@ import java.nio.charset.StandardCharsets
 class TelegramBotService(private val botToken: String) {
 
     private var client: HttpClient = HttpClient.newBuilder().build()
-
     private val json: Json = Json { ignoreUnknownKeys = true }
 
     fun getUpdates(updateId: Long): Response? {
@@ -57,6 +57,9 @@ class TelegramBotService(private val botToken: String) {
                     listOf(
                         InlineKeyboard(text = "Изучить слова", callbackData = LEARN_WORD_BUTTON_PRESSED),
                         InlineKeyboard(text = "Статистика", callbackData = STATISTICS_BUTTON_PRESSED)
+                    ),
+                    listOf(
+                        InlineKeyboard(text = "Сбросить прогресс", callbackData = RESET_PRESSED)
                     )
                 )
             )
