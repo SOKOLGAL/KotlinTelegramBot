@@ -29,15 +29,29 @@ fun main(args: Array<String>) {
         if (text?.lowercase() == "/start") {
             telegramBotService.sendMenu(chatId)
         }
-
         if (data?.lowercase() == STATISTICS_BUTTON_PRESSED) {
             telegramBotService.sendStatistics(trainer.getStatistics(), chatId)
         }
         if (data?.lowercase() == LEARN_WORD_BUTTON_PRESSED) {
             checkNextQuestionAndSend(trainer, telegramBotService, chatId)
         }
+        if (data?.startsWith(CALLBACK_DATA_ANSWER_PREFIX) == true) {
+            val userAnswerIndex = data.substringAfter(CALLBACK_DATA_ANSWER_PREFIX).toIntOrNull() ?: -1
+            val isCorrect = trainer.checkAnswer(userAnswerIndex)
+            if (isCorrect) {
+                telegramBotService.sendMessage(chatId, "Правильно!")
+            } else {
+                val message = """
+               Неправильно!
+               ${trainer.question?.correctAnswer?.original} - это ${trainer.question?.correctAnswer?.translate}
+               """.trimIndent()
+                telegramBotService.sendMessage(chatId, message)
+            }
+            checkNextQuestionAndSend(trainer, telegramBotService, chatId)
+        }
     }
 }
+
 
 fun checkNextQuestionAndSend(
     trainer: LearnWordsTrainer,
@@ -51,6 +65,7 @@ fun checkNextQuestionAndSend(
         telegramBotService.sendQuestion(chatId, nextQuestion)
     }
 }
+
 
 const val STATISTICS_BUTTON_PRESSED = "statistics_clicked"
 const val LEARN_WORD_BUTTON_PRESSED = "learn_words_clicked"
