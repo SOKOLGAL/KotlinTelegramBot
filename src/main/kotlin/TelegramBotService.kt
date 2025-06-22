@@ -9,11 +9,14 @@ import java.net.http.HttpResponse
 import java.nio.charset.StandardCharsets
 
 class TelegramBotService(private val botToken: String) {
+
     companion object {
         const val BASE_URL: String = "https://api.telegram.org"
     }
 
     private var client: HttpClient = HttpClient.newBuilder().build()
+
+    private val json: Json = Json { ignoreUnknownKeys = true }
 
     fun getUpdates(updateId: Long): String {
         val urlGetUpdates = "$BASE_URL/bot$botToken/getUpdates?offset=$updateId"
@@ -22,7 +25,7 @@ class TelegramBotService(private val botToken: String) {
         return response.body()
     }
 
-    fun sendMessage(json: Json, chatId: Long?, text: String): String {
+    fun sendMessage(chatId: Long?, text: String): String {
         val urlSendMessage = "$BASE_URL/bot$botToken/sendMessage"
         val requestBody = SendMessageRequest(
             chatId = chatId,
@@ -37,7 +40,7 @@ class TelegramBotService(private val botToken: String) {
         return response.body()
     }
 
-    fun sendMenu(json: Json, chatId: Long?): String {
+    fun sendMenu(chatId: Long?): String {
         val urlSendMessage = "$BASE_URL/bot$botToken/sendMessage"
         val requestBody = SendMessageRequest(
             chatId = chatId,
@@ -73,7 +76,7 @@ class TelegramBotService(private val botToken: String) {
         return response.body()
     }
 
-    fun sendQuestion(json: Json, chatId: Long?, question: Question): String {
+    fun sendQuestion(chatId: Long?, question: Question): String {
         val urlSendMessage = "$BASE_URL/bot$botToken/sendMessage"
         val requestBody = SendMessageRequest(
             chatId = chatId,
