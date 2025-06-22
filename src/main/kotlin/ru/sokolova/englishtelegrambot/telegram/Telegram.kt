@@ -1,32 +1,30 @@
-package org.example
+package ru.sokolova.englishtelegrambot.telegram
+
+import ru.sokolova.englishtelegrambot.trainer.LearnWordsTrainer
+import ru.sokolova.englishtelegrambot.telegram.api.TelegramBotService
+import ru.sokolova.englishtelegrambot.telegram.api.entities.Response
 
 fun main(args: Array<String>) {
 
     val botToken = args[0]
-    var updateId: Int = 0
+    var updateId = 0L
 
     val telegramBotService = TelegramBotService(botToken)
-
-    val updateIdRegex: Regex = "\"update_id\":(.+?),".toRegex()
-    val messageTextRegex: Regex = "\"text\":\"(.+?)\"".toRegex()
-    val chatIdRegex: Regex = """},"chat":\{"id":(\d+),"first_name"""".toRegex()
-    val dataRegex: Regex = "\"data\":\"(.+?)\"".toRegex()
-
     val trainer = LearnWordsTrainer()
 
     while (true) {
         Thread.sleep(2000)
-        val updates: String = telegramBotService.getUpdates(updateId)
-        println(updates)
-        updateId = updateIdRegex.find(updates)?.groups?.get(1)?.value?.toIntOrNull()?.plus(1) ?: continue
-        val text = messageTextRegex.find(updates)?.groups?.get(1)?.value
-        val chatId = chatIdRegex.find(updates)?.groups?.get(1)?.value?.toIntOrNull() ?: continue
-        val data = dataRegex.find(updates)?.groups?.get(1)?.value
 
-        if (text?.lowercase() == "hello") {
-            telegramBotService.sendMessage(chatId, text)
-        }
-        if (text?.lowercase() == "/start") {
+        val response: Response = telegramBotService.getUpdates(updateId) ?: continue
+        val updates = response.result
+        val firstUpdate = updates.firstOrNull() ?: continue
+        updateId = firstUpdate.updateId.plus(1)
+
+        val text = firstUpdate.message?.text
+        val chatId = firstUpdate.message?.chat?.id ?: firstUpdate.callbackQuery?.message?.chat?.id
+        val data = firstUpdate.callbackQuery?.data
+
+        if (text?.lowercase() == COMMAND_START) {
             telegramBotService.sendMenu(chatId)
         }
         if (data?.lowercase() == STATISTICS_BUTTON_PRESSED) {
@@ -52,11 +50,10 @@ fun main(args: Array<String>) {
     }
 }
 
-
 fun checkNextQuestionAndSend(
     trainer: LearnWordsTrainer,
     telegramBotService: TelegramBotService,
-    chatId: Int
+    chatId: Long?,
 ) {
     val nextQuestion = trainer.getNextQuestion()
     if (nextQuestion == null) {
@@ -66,7 +63,7 @@ fun checkNextQuestionAndSend(
     }
 }
 
-
 const val STATISTICS_BUTTON_PRESSED = "statistics_clicked"
 const val LEARN_WORD_BUTTON_PRESSED = "learn_words_clicked"
 const val CALLBACK_DATA_ANSWER_PREFIX = "answer_"
+const val COMMAND_START = "/start"
