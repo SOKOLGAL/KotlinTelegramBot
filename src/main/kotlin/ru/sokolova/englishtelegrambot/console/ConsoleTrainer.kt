@@ -1,4 +1,8 @@
-package org.example
+package ru.sokolova.englishtelegrambot.console
+
+import ru.sokolova.englishtelegrambot.trainer.LearnWordsTrainer
+import ru.sokolova.englishtelegrambot.trainer.modal.Question
+import ru.sokolova.englishtelegrambot.trainer.modal.Word
 
 fun Question.asConsoleString(): String {
     val variants = this.variants

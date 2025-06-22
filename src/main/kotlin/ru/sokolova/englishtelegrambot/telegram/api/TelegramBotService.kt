@@ -1,6 +1,15 @@
-package org.example
+package ru.sokolova.englishtelegrambot.telegram.api
 
 import kotlinx.serialization.json.Json
+import ru.sokolova.englishtelegrambot.telegram.CALLBACK_DATA_ANSWER_PREFIX
+import ru.sokolova.englishtelegrambot.telegram.LEARN_WORD_BUTTON_PRESSED
+import ru.sokolova.englishtelegrambot.telegram.STATISTICS_BUTTON_PRESSED
+import ru.sokolova.englishtelegrambot.telegram.api.entities.InlineKeyboard
+import ru.sokolova.englishtelegrambot.telegram.api.entities.ReplyMarkup
+import ru.sokolova.englishtelegrambot.telegram.api.entities.Response
+import ru.sokolova.englishtelegrambot.telegram.api.entities.SendMessageRequest
+import ru.sokolova.englishtelegrambot.trainer.modal.Question
+import ru.sokolova.englishtelegrambot.trainer.modal.Statistics
 import java.net.URI
 import java.net.URLEncoder
 import java.net.http.HttpClient
@@ -10,19 +19,17 @@ import java.nio.charset.StandardCharsets
 
 class TelegramBotService(private val botToken: String) {
 
-    companion object {
-        const val BASE_URL: String = "https://api.telegram.org"
-    }
-
     private var client: HttpClient = HttpClient.newBuilder().build()
 
     private val json: Json = Json { ignoreUnknownKeys = true }
 
-    fun getUpdates(updateId: Long): String {
+    fun getUpdates(updateId: Long): Response? {
         val urlGetUpdates = "$BASE_URL/bot$botToken/getUpdates?offset=$updateId"
         val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlGetUpdates)).build()
         val response: HttpResponse<String> = client.send(request, HttpResponse.BodyHandlers.ofString())
-        return response.body()
+        val responseString = response.body()
+        println(responseString)
+        return runCatching { json.decodeFromString<Response>(responseString) }.getOrNull()
     }
 
     fun sendMessage(chatId: Long?, text: String): String {
@@ -96,5 +103,9 @@ class TelegramBotService(private val botToken: String) {
             .build()
         val response: HttpResponse<String> = client.send(request, HttpResponse.BodyHandlers.ofString())
         return response.body()
+    }
+
+    companion object {
+        const val BASE_URL: String = "https://api.telegram.org"
     }
 }

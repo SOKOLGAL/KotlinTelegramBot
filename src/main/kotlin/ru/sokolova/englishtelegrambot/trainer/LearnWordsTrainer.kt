@@ -1,27 +1,14 @@
-package org.example
+package ru.sokolova.englishtelegrambot.trainer
 
-import kotlinx.serialization.Serializable
+import ru.sokolova.englishtelegrambot.trainer.modal.Question
+import ru.sokolova.englishtelegrambot.trainer.modal.Statistics
+import ru.sokolova.englishtelegrambot.trainer.modal.Word
 import java.io.File
 
-@Serializable
-data class Word(
-    val original: String,
-    val translate: String,
-    var correctAnswersCount: Int = 0,
-)
-
-data class Statistics(
-    val totalCount: Int,
-    var learnedCount: Int,
-    val percent: Int,
-)
-
-data class Question(
-    val variants: List<Word>,
-    val correctAnswer: Word,
-)
-
-class LearnWordsTrainer(private val learnedAnswerCount: Int = 3, private val countOfQuestionWords: Int = 4) {
+class LearnWordsTrainer(
+    private val learnedAnswerCount: Int = 3,
+    private val countOfQuestionWords: Int = 4
+) {
     private val dictionary: List<Word> = loadDictionary()
     var question: Question? = null
 
@@ -84,6 +71,8 @@ class LearnWordsTrainer(private val learnedAnswerCount: Int = 3, private val cou
             wordsFile.appendText("${word.original}|${word.translate}|${word.correctAnswersCount}\n")
         }
     }
-}
 
-const val PERCENT = 100
+    companion object {
+        private const val PERCENT = 100
+    }
+}
