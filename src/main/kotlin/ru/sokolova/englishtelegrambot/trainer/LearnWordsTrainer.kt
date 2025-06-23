@@ -6,6 +6,7 @@ import ru.sokolova.englishtelegrambot.trainer.modal.Word
 import java.io.File
 
 class LearnWordsTrainer(
+    private val fileName: String = "words.txt",
     private val learnedAnswerCount: Int = 3,
     private val countOfQuestionWords: Int = 4
 ) {
@@ -52,8 +53,13 @@ class LearnWordsTrainer(
 
     private fun loadDictionary(): List<Word> {
         try {
+            val wordsFile: File = File(fileName)
+            if (!wordsFile.exists()) {
+                File("words.txt").copyTo(wordsFile)
+            }
             val dictionary: MutableList<Word> = mutableListOf()
-            val wordsFile: File = File("words.txt")
+
+
             wordsFile.readLines().forEach {
                 val splitLine = it.split("|")
                 dictionary.add(Word(splitLine[0], splitLine[1], splitLine[2].toIntOrNull() ?: 0))
@@ -65,11 +71,16 @@ class LearnWordsTrainer(
     }
 
     private fun saveDictionary() {
-        val wordsFile: File = File("words.txt")
+        val wordsFile: File = File(fileName)
         wordsFile.writeText("")
         for (word in dictionary) {
             wordsFile.appendText("${word.original}|${word.translate}|${word.correctAnswersCount}\n")
         }
+    }
+
+    fun resetProgress() {
+        dictionary.forEach { it.correctAnswersCount = 0 }
+        saveDictionary()
     }
 
     companion object {

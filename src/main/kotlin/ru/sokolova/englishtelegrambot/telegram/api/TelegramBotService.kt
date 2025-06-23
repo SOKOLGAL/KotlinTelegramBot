@@ -1,9 +1,7 @@
 package ru.sokolova.englishtelegrambot.telegram.api
 
 import kotlinx.serialization.json.Json
-import ru.sokolova.englishtelegrambot.telegram.CALLBACK_DATA_ANSWER_PREFIX
-import ru.sokolova.englishtelegrambot.telegram.LEARN_WORD_BUTTON_PRESSED
-import ru.sokolova.englishtelegrambot.telegram.STATISTICS_BUTTON_PRESSED
+import ru.sokolova.englishtelegrambot.telegram.*
 import ru.sokolova.englishtelegrambot.telegram.api.entities.InlineKeyboard
 import ru.sokolova.englishtelegrambot.telegram.api.entities.ReplyMarkup
 import ru.sokolova.englishtelegrambot.telegram.api.entities.Response
@@ -20,7 +18,6 @@ import java.nio.charset.StandardCharsets
 class TelegramBotService(private val botToken: String) {
 
     private var client: HttpClient = HttpClient.newBuilder().build()
-
     private val json: Json = Json { ignoreUnknownKeys = true }
 
     fun getUpdates(updateId: Long): Response? {
@@ -57,6 +54,9 @@ class TelegramBotService(private val botToken: String) {
                     listOf(
                         InlineKeyboard(text = "Изучить слова", callbackData = LEARN_WORD_BUTTON_PRESSED),
                         InlineKeyboard(text = "Статистика", callbackData = STATISTICS_BUTTON_PRESSED)
+                    ),
+                    listOf(
+                        InlineKeyboard(text = "Сбросить прогресс", callbackData = RESET_PRESSED)
                     )
                 )
             )
@@ -89,11 +89,21 @@ class TelegramBotService(private val botToken: String) {
             chatId = chatId,
             text = question.correctAnswer.original,
             replyMarkup = ReplyMarkup(
-                listOf(question.variants.mapIndexed { index, word ->
-                    InlineKeyboard(
-                        text = word.translate, callbackData = "$CALLBACK_DATA_ANSWER_PREFIX$index"
+                question.variants.mapIndexed { index, word ->
+                    listOf(
+                        InlineKeyboard(
+                            text = word.translate,
+                            callbackData = "$CALLBACK_DATA_ANSWER_PREFIX$index"
+                        )
                     )
-                })
+                } + listOf(
+                    listOf(
+                        InlineKeyboard(
+                            text = "Выход",
+                            callbackData = CALLBACK_DATA_EXIT
+                        )
+                    )
+                )
             )
         )
         val requestBodyString = json.encodeToString(requestBody)
