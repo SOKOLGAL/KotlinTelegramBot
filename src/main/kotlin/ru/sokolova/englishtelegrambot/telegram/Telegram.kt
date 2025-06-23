@@ -35,32 +35,38 @@ fun handleUpdate(
 
     val trainer = trainers.getOrPut(chatId) { LearnWordsTrainer("$chatId.txt") }
 
-    if (text?.lowercase() == COMMAND_START) {
-        telegramBotService.sendMenu(chatId)
-    }
-    if (data?.lowercase() == STATISTICS_BUTTON_PRESSED) {
-        telegramBotService.sendStatistics(trainer.getStatistics(), chatId)
-    }
-    if (data?.lowercase() == LEARN_WORD_BUTTON_PRESSED) {
-        checkNextQuestionAndSend(trainer, telegramBotService, chatId)
-    }
-    if (data == RESET_PRESSED) {
-        trainer.resetProgress()
-        telegramBotService.sendMessage(chatId, "Прогресс сброшен")
-    }
-    if (data?.startsWith(CALLBACK_DATA_ANSWER_PREFIX) == true) {
-        val userAnswerIndex = data.substringAfter(CALLBACK_DATA_ANSWER_PREFIX).toIntOrNull() ?: -1
-        val isCorrect = trainer.checkAnswer(userAnswerIndex)
-        if (isCorrect) {
-            telegramBotService.sendMessage(chatId, "Правильно!")
-        } else {
-            val message = """
+    when {
+        text?.lowercase() == COMMAND_START ->
+            telegramBotService.sendMenu(chatId)
+
+        data?.lowercase() == STATISTICS_BUTTON_PRESSED ->
+            telegramBotService.sendStatistics(trainer.getStatistics(), chatId)
+
+        data?.lowercase() == LEARN_WORD_BUTTON_PRESSED ->
+            checkNextQuestionAndSend(trainer, telegramBotService, chatId)
+
+        data?.lowercase() == CALLBACK_DATA_EXIT ->
+            telegramBotService.sendMenu(chatId)
+
+        data?.lowercase() == RESET_PRESSED -> {
+            trainer.resetProgress()
+            telegramBotService.sendMessage(chatId, "Прогресс сброшен")
+        }
+
+        data?.startsWith(CALLBACK_DATA_ANSWER_PREFIX) == true -> {
+            val userAnswerIndex = data.substringAfter(CALLBACK_DATA_ANSWER_PREFIX).toIntOrNull() ?: -1
+            val isCorrect = trainer.checkAnswer(userAnswerIndex)
+            if (isCorrect) {
+                telegramBotService.sendMessage(chatId, "Правильно!")
+            } else {
+                val message = """
               Неправильно!
               ${trainer.question?.correctAnswer?.original} - это ${trainer.question?.correctAnswer?.translate}
               """.trimIndent()
-            telegramBotService.sendMessage(chatId, message)
+                telegramBotService.sendMessage(chatId, message)
+            }
+            checkNextQuestionAndSend(trainer, telegramBotService, chatId)
         }
-        checkNextQuestionAndSend(trainer, telegramBotService, chatId)
     }
 }
 
@@ -80,5 +86,6 @@ fun checkNextQuestionAndSend(
 const val STATISTICS_BUTTON_PRESSED = "statistics_clicked"
 const val LEARN_WORD_BUTTON_PRESSED = "learn_words_clicked"
 const val RESET_PRESSED = "reset_clicked"
+const val CALLBACK_DATA_EXIT = "exit_clicked"
 const val CALLBACK_DATA_ANSWER_PREFIX = "answer_"
 const val COMMAND_START = "/start"
