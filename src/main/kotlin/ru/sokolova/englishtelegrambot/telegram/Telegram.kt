@@ -14,8 +14,7 @@ fun main(args: Array<String>) {
     val trainers = HashMap<Long, LearnWordsTrainer>()
 
     while (true) {
-        Thread.sleep(2000)
-
+        Thread.sleep(POLLING_DELAY_MS)
 
         val response: Response = telegramBotService.getUpdates(lastUpdateId) ?: continue
         if (response.result.isEmpty()) continue
@@ -89,3 +88,4 @@ const val RESET_PRESSED = "reset_clicked"
 const val CALLBACK_DATA_EXIT = "exit_clicked"
 const val CALLBACK_DATA_ANSWER_PREFIX = "answer_"
 const val COMMAND_START = "/start"
+const val POLLING_DELAY_MS = 2000L

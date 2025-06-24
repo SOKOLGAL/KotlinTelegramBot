@@ -87,12 +87,12 @@ class TelegramBotService(private val botToken: String) {
         val urlSendMessage = "$BASE_URL/bot$botToken/sendMessage"
         val requestBody = SendMessageRequest(
             chatId = chatId,
-            text = question.correctAnswer.original,
+            text = question.correctAnswer.original.replaceFirstChar { it.titlecase() },
             replyMarkup = ReplyMarkup(
                 question.variants.mapIndexed { index, word ->
                     listOf(
                         InlineKeyboard(
-                            text = word.translate,
+                            text = word.translate.replaceFirstChar { it.titlecase() },
                             callbackData = "$CALLBACK_DATA_ANSWER_PREFIX$index"
                         )
                     )
