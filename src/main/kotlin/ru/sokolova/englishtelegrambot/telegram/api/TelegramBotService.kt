@@ -87,7 +87,8 @@ class TelegramBotService(private val botToken: String) {
         val urlSendMessage = "$BASE_URL/bot$botToken/sendMessage"
         val requestBody = SendMessageRequest(
             chatId = chatId,
-            text = question.correctAnswer.original.replaceFirstChar { it.titlecase() },
+            text = question.correctAnswer.original.replaceFirstChar { it.titlecase() }
+                    + " ${question.correctAnswer.transcription}",
             replyMarkup = ReplyMarkup(
                 question.variants.mapIndexed { index, word ->
                     listOf(
