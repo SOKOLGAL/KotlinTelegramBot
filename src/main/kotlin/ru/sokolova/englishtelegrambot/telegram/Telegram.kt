@@ -60,7 +60,8 @@ fun handleUpdate(
             } else {
                 val message = """
               Неправильно!
-              ${trainer.question?.correctAnswer?.original} - это ${trainer.question?.correctAnswer?.translate}
+              ${trainer.question?.correctAnswer?.original?.replaceFirstChar { it.titlecase() } ?: ""} 
+              - это ${trainer.question?.correctAnswer?.translate}
               """.trimIndent()
                 telegramBotService.sendMessage(chatId, message)
             }
