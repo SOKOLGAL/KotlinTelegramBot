@@ -6,5 +6,6 @@ import kotlinx.serialization.Serializable
 data class Word(
     val original: String,
     val translate: String,
+    val transcription: String,
     var correctAnswersCount: Int = 0,
 )

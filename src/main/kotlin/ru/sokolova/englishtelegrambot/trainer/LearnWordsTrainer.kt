@@ -59,10 +59,10 @@ class LearnWordsTrainer(
             }
             val dictionary: MutableList<Word> = mutableListOf()
 
-
             wordsFile.readLines().forEach {
                 val splitLine = it.split("|")
-                dictionary.add(Word(splitLine[0], splitLine[1], splitLine[2].toIntOrNull() ?: 0))
+                dictionary.add(Word(splitLine[0],  splitLine[1],
+                    splitLine[2],splitLine[3].toIntOrNull() ?: 0))
             }
             return dictionary
         } catch (e: IndexOutOfBoundsException) {
@@ -74,7 +74,7 @@ class LearnWordsTrainer(
         val wordsFile: File = File(fileName)
         wordsFile.writeText("")
         for (word in dictionary) {
-            wordsFile.appendText("${word.original}|${word.translate}|${word.correctAnswersCount}\n")
+            wordsFile.appendText("${word.original}|${word.translate}|${word.transcription}|${word.correctAnswersCount}\n")
         }
     }
 
