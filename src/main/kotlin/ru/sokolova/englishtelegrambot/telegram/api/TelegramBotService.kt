@@ -8,17 +8,44 @@ import ru.sokolova.englishtelegrambot.telegram.api.entities.Response
 import ru.sokolova.englishtelegrambot.telegram.api.entities.SendMessageRequest
 import ru.sokolova.englishtelegrambot.trainer.modal.Question
 import ru.sokolova.englishtelegrambot.trainer.modal.Statistics
+import java.io.IOException
 import java.net.URI
 import java.net.URLEncoder
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.nio.charset.StandardCharsets
+import java.time.Duration.ofSeconds
+import kotlin.time.Duration
 
 class TelegramBotService(private val botToken: String) {
 
-    private var client: HttpClient = HttpClient.newBuilder().build()
+    private val client: HttpClient = HttpClient.newBuilder()
+        .connectTimeout(Duration.run { ofSeconds(10) })
+        .version(HttpClient.Version.HTTP_2)
+        .build()
     private val json: Json = Json { ignoreUnknownKeys = true }
+
+    fun sendRequestWithRetry(
+        request: HttpRequest,
+        maxRetries: Int = 3,
+        delayMillis: Long = 1000L
+    ): HttpResponse<String> {
+        var lastException: Exception? = null
+
+        repeat(maxRetries) { attempt ->
+            try {
+                val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+                return response
+            } catch (e: IOException) {
+                lastException = e
+                println("Попытка ${attempt + 1} провалена: ${e.message}. Повтор через $delayMillis мс")
+                Thread.sleep(delayMillis)
+            }
+        }
+
+        throw lastException ?: RuntimeException("Неизвестная ошибка при отправке запроса")
+    }
 
     fun getUpdates(updateId: Long): Response? {
         val urlGetUpdates = "$BASE_URL/bot$botToken/getUpdates?offset=$updateId"

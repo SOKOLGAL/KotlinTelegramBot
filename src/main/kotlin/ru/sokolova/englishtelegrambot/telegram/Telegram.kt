@@ -4,6 +4,8 @@ import ru.sokolova.englishtelegrambot.trainer.LearnWordsTrainer
 import ru.sokolova.englishtelegrambot.telegram.api.TelegramBotService
 import ru.sokolova.englishtelegrambot.telegram.api.entities.Response
 import ru.sokolova.englishtelegrambot.telegram.api.entities.Update
+import java.net.URI
+import java.net.http.HttpRequest
 
 fun main(args: Array<String>) {
 
@@ -14,13 +16,25 @@ fun main(args: Array<String>) {
     val trainers = HashMap<Long, LearnWordsTrainer>()
 
     while (true) {
-        Thread.sleep(POLLING_DELAY_MS)
+        try {
+            Thread.sleep(POLLING_DELAY_MS)
 
-        val response: Response = telegramBotService.getUpdates(lastUpdateId) ?: continue
-        if (response.result.isEmpty()) continue
-        val sortedUpdates = response.result.sortedBy { it.updateId }
-        sortedUpdates.forEach { handleUpdate(it, trainers, telegramBotService) }
-        lastUpdateId = sortedUpdates.last().updateId + 1
+            val telegramResponse: Response = telegramBotService.getUpdates(lastUpdateId) ?: continue
+            if (telegramResponse.result.isEmpty()) continue
+
+            val sortedUpdates = telegramResponse.result.sortedBy { it.updateId }
+            sortedUpdates.forEach { handleUpdate(it, trainers, telegramBotService) }
+            lastUpdateId = sortedUpdates.last().updateId + 1
+
+            val request = HttpRequest.newBuilder()
+                .uri(URI.create("https://api.telegram.org"))
+                .GET()
+                .build()
+            val httpResponse = telegramBotService.sendRequestWithRetry(request)
+            println(httpResponse.body())
+        } catch (e: Exception) {
+            println("Ошибка в цикле: ${e.message}")
+        }
     }
 }
 
@@ -60,7 +74,7 @@ fun handleUpdate(
             } else {
                 val message = """
               Неправильно!
-              ${trainer.question?.correctAnswer?.original?.replaceFirstChar { it.titlecase() } ?: ""} - это ${trainer.question?.correctAnswer?.translate}
+              ${trainer.question?.correctAnswer?.original?.replaceFirstChar { it.titlecase() }} - это ${trainer.question?.correctAnswer?.translate}
               """.trimIndent()
                 telegramBotService.sendMessage(chatId, message)
             }
@@ -88,4 +102,4 @@ const val RESET_PRESSED = "reset_clicked"
 const val CALLBACK_DATA_EXIT = "exit_clicked"
 const val CALLBACK_DATA_ANSWER_PREFIX = "answer_"
 const val COMMAND_START = "/start"
-const val POLLING_DELAY_MS = 2000L
+const val POLLING_DELAY_MS = 1000L
